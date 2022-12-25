@@ -5,11 +5,13 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>Cocoon</title>
-  <style type="text/css">
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      span.underline{text-decoration: underline;}
-      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
   </style>
   <link rel="stylesheet" href="/assets/css/styling.max.css" />
   <script>
@@ -17,17 +19,17 @@
     if (prefers_dark_theme() != dark_theme){
       switch_themes();
     }
-  
+
     function prefers_dark_theme(){
       return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
-  
+
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
       if(event.matches != dark_theme){
         switch_themes();
       }
     });
-  
+
     function switch_themes(){
       let root_style = document.documentElement.style;
       let root_comp_style = getComputedStyle(document.documentElement);
