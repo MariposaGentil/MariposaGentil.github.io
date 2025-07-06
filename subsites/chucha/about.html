@@ -2,7 +2,6 @@
 <script>const IVS = '01FFE56789AB99DEF0123456789A553E'; const SALT = '0D4DAFDB5DA484A7';</script>
 <script>
     let encoded_html = ''
-    //let input_html = '<div class="form__group field"><input type="password" class="form__field" placeholder="Password" name="password" id="Password" required /><label for="password" class="form__label">Password</label></div>';
     
     window.addEventListener("DOMContentLoaded", function () {
         const encoded_b64 = atob(document.body.innerHTML);
@@ -174,6 +173,13 @@
 	 color: #9b9b9b;
      pointer-events: none;
 }
+
+ .form__label#enter_label{
+    display: inline-block;
+    width: 98%;
+    text-align: right;
+}
+
  .form__field:focus {
 	 padding-bottom: 6px;
 	 font-weight: 700;
@@ -194,6 +200,7 @@
  .form__field:required, .form__field:invalid {
 	 box-shadow: none;
 }
+
 /* demo */
  body {
 	 font-family: 'Poppins', sans-serif;
