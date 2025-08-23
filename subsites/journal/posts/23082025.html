@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Erik Bermejo">
+  <title>Desde el Hospital - Cocoon</title>
+  <style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="/subsites/journal/assets/css/styling.max.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script>
+  let is_dark_theme = true;
+  let cookie_theme_value = undefined;
+
+  window.addEventListener("load", function () {
+    console.log("On load event");
+    setup_switch_theme_btn();
+
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (event) => {
+        if (cookie_theme_value != undefined) {
+          console.log('Ignoring browser theme, cookie found');
+          return;
+        }
+        if (event.matches != is_dark_theme) {
+          switch_themes();
+        }
+      });
+    if (user_prefers_dark_theme() != is_dark_theme) {
+      switch_themes();
+    }
+  });
+
+  function reload_cookie_theme_value() {
+    cookies = document.cookie;
+    value = cookies
+      .split("; ")
+      .find((row) => row.startsWith("theme="))
+      ?.split("=")[1];
+
+    cookie_theme_value = value;
+  }
+  function user_prefers_dark_theme() {
+    reload_cookie_theme_value();
+    if (cookie_theme_value == undefined) {
+      return (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    } else {
+      return cookie_theme_value == "dark";
+    }
+  }
+  function setup_switch_theme_btn() {
+    let btn = document.getElementsByClassName("change-theme")[0];
+    btn.addEventListener("click", function () {
+      switch_themes();
+      cookie = is_dark_theme ? "theme=dark;" : "theme=light;";
+      cookie += " SameSite=Strict; Path=/;";
+      document.cookie = cookie;
+      reload_cookie_theme_value();
+    });
+    if (is_dark_theme) {
+      btn.innerHTML = "light_mode";
+    } else {
+      btn.innerHTML = "dark_mode";
+    }
+  }
+  function switch_themes() {
+    let root_style = document.documentElement.style;
+    let root_comp_style = getComputedStyle(document.documentElement);
+    let target_theme = "dark";
+    let btn = document.getElementsByClassName("change-theme")[0];
+    if (is_dark_theme) {
+      target_theme = "light";
+      btn.innerHTML = "dark_mode";
+    } else {
+      btn.innerHTML = "light_mode";
+    }
+    root_style.setProperty(
+      "--theme-bg-color",
+      root_comp_style.getPropertyValue("--" + target_theme + "-theme-bg-color")
+    );
+    root_style.setProperty(
+      "--theme-content-color",
+      root_comp_style.getPropertyValue(
+        "--" + target_theme + "-theme-content-color"
+      )
+    );
+    root_style.setProperty(
+      "--theme-content-color-lighter",
+      root_comp_style.getPropertyValue("--" + target_theme + "-theme-content-color-lighter")
+    );
+    is_dark_theme = !is_dark_theme;
+  }
+  </script>
+<link rel="icon" type="image/x-icon" href="/subsites/journalfavicon.ico">
+</head>
+<body>
+<div class="pre-post">
+<p><a href="../">home</a></p>
+<header>
+<h1 class="title">Desde el Hospital</h1>
+
+<p class="author">Erik Bermejo</p>
+
+<p class="date">23/08/2025</p>
+</header>
+
+</div>
+</div>
+<div class="post">
+<p>Escribo esto desde el hospital, usando github mobile, en un
+improvisado arranque de honestidad para con uno mismo. Ruego se me
+disculpe las posibles faltas tanto estructurales, gramáticales y
+ortográficas. No, las ortográficas no me las perdoneis, trás veinticinco
+años de pelea continua conmigo mismo, debería empezar a resolverlas.</p>
+<p>Marina está leyendo, mientras esperamos a que se convoque a una de
+sus usuarias a la consulta. Un ataque de asma, nada grave. Los dos
+tenemos experiencia suficiente como para saber que la activación de unas
+guardia es siempre inoportuna, siendo especialmente hiriente en sábado
+de cumpleaños de un amigo. Aunque no es ni el momento ni el lugar de
+hacer una fotografía, me comprometo a subir alguna de otro momento.</p>
+<p>Ningún evento provoca esta entrada, así que me limitaré a hacer una
+pequeña actualización de mi estado actual y de las últimas semanas. Han
+pasado 8 meses desde que empecé la relación con Marina y siento que no
+mucho ha pasado. Nada más alejado de la realidad, con ella paso más
+tiempo que conmigo mismo (Lo que no sé hasta que punto es sano). Hemos
+hecho varios viajes juntos y decidimos compartir hogar desde mayo de
+este año, un grán paso para alguien que no había compartido techo desde
+que se emancipó y mucho menos vida desde que comenzó estudios
+superiores.</p>
+<p>La convivencia surgio naturalmente. Hasta el día de la decisión, ya
+llevávamos varios meses donde era raro el día en que no dormíamos
+juntos. Hicimos la mudanza en una semana y pronto mi casa estaba repleta
+de objetos de su propiedad que hiceron que esa casa se sintiese más
+hogar que nunca. Curiosamente, una semana antes de la mudanza, un obrero
+arregló “el suelo de ni cocina”, realidad que durante demasiado tiempo
+resquebrajó mi bien estar y comodidad y que plasme en una poesía con el
+mismo nombre, que no sólo hablaba de la realidad de mi suelo sino de la
+de mi vida laboral.</p>
+<p>Aunque pienso que la convivencia podría ser mucho más problemática,
+eso no quita que tengamos momentos dificiles, incompatibilidades de
+nuestras personalidades e inseguridades propias que proyectamos al
+contrario. Hemos tenido csrias discusiones en las que uno, otro o los
+dos acabamos llorando, o con ataques de ansiedad. Por mi parte hay tres
+temas que me preocupan sobre cualquier otro de esta relación, y que en
+más de una ocasión, han causado roze: - Siento que en muchas ocasiones,
+estoy “desactivando una bomba” cuando hablo con ella. No cuando hablo de
+temas sensibles, sino en cualquier momento. Ya que hay veces que una
+frase inofensiva ha causado preocupación, agobio o enfado explosivo. Una
+de mas causas ya la detectamos y le transmití, ya que me parecia que en
+muchas ocasiones ella pensaba en como yo debiese responder a algo o
+alguien, y en el caso de no responder de esa manera, Marina acaba
+decepcionada. Pero intuyo otros motivos. - Personalidades contrarias
+cuando se trata de relajarse. Marina sufre de un estrés “crónico” por
+mutitud de preocupaciones, mientras que yo, intento ignorarlas (las
+mías) o llevar acabo actividades para no reflexionar sobre ellas. Eso
+unido a mi energia y sus problemas fisiológicos que causan cansancio,
+llevan a una relación en la que uno de los integrantes necesita hacer
+actividades continuamente mientras el ptro prefiere acostarse e intentsr
+apagar el cerebro para obtener descanso. Agobios y discusiones han
+aparecido sobre la imposibilidad de conciliar estos dos hechos. Debemos
+encontrsr una manera de llevarlo los dos. - Por su parte (la de Marina)
+siento que debido a mi extrema torpeza, tiene que enseñarme para que
+“haga” las cosas a su modo y evitar mi torpeza. O al menos así lo recivo
+yo… La última vez que tuvimos una mala época al respecto, tuvimos tal
+discusión que nos dá miedo hablar del tema. Por mi parte, siento que
+ella piensa que nada de lo que hago está bien hecho a no ser que sea
+como ella quiera… lo que ella ignora, es que muchas de mis costumbres
+existen precisamente para lidiar con mi torpeza.</p>
+<p>Dicen que la convivencia es extremadamente dura, y así mismo dicen
+que el primer año es aún más duro, pero que a partir de ahí todo se
+vuelve mucho más usual y cariñoso. Hoy mismo he escuchado de mi amiga
+Lina una frase que me gusta mucho y que apunto &gt; “<strong>Hacer cosas
+difíciles es dificil</strong>” Siento algo de miedo de estar empezando
+una convivencia seria y que va a una velocidad a la que no estoy
+acostumbrado debido a mi corta experiencia en estos campos del
+conocimiento, de comenzar a tener una vida en común con una persona que
+no siento conocer en plenitud. Aunque eso es algo complejo que lleva
+mucho tiempo. Mi única experiencia parecida empezaba a plantearse cuando
+llevaba más de 6 años en una relación con la persona.</p>
+<p>Aunque sienta miedo, me siento ilusionado de esta nueva étapa de mi
+vida, y aunque los momentos malos son muy malos, son también escasos y
+espaciados en el tiempo, mientras que los buenos son muchos y continuos.
+En ocasiones me es dificultoso mantener ese hecho en mente, pero cuando
+porfin sobrevivimos al desastre, nos abrazamos con cariño y nos besamos,
+el cielo se abre y la vida se torna del color del clavel.</p>
+<p>En mi cumpleaños, entre otras cosas, Marina me regaló una cámara de
+fotos analógica, yo llevaba un par de meses diciendo que me apetecía
+empezar con la fotografía analógica, pero el dispositivo brilla por su
+simplicidad y no puedo llevar a cabo tareas técnicas, ella lo sabía y se
+fustigó mucho cuando me la regaló por “no ser lo suficientemente buena”.
+Yo me sentí increíblemente feliz de estsr con una persona que escucha
+mis inquietudes y que responde ante ellas. Decidí comprar unos carretes
+y desde entonces, intento grabar en la película los momentos importantes
+de la relacion. Todavía queda algo menos de la mitad del carrete, pero
+eso no es por falta de momentos sino por mi esfuerzo de activo de no
+apretar el obturador continuamente. El carrete ya esta llenos de lo que
+llamo “fotografías de la rutina en pareja”, pero la canción DtMF no para
+de sonar en mi cabeza.</p>
+<p>La entrada empieza a hacerse larga, y mi teléfono empieza a quejarse
+de ma batería, guardaré la escritura y cerraré el diario.</p>
+<p>Solo una cosa más que decir, me cuesta expresar la necesidad que
+tengo de relaizsr hobys o de tener tiempo a solas o con otras personas
+sin estar con Marina, es algo que tengo que resolver, pero acabo de
+salir del hospital al que he ido volutariamente teniendo objetivamente
+mejores planes, por el mero hecho de preferir pasar la noche con
+ella</p>
+</div>
+<div class="post-post">
+<p class="material-symbols-outlined change-theme">light_mode</p>
+
+</div>
+</body>
+</html>
