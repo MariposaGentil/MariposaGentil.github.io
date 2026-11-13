@@ -190,7 +190,7 @@
     function inboxNote(title, body, originName) {
       let markdown = `---\ntags:\n  - capture\n---\n\n# ${title}\n`;
       if (body) markdown += `\n${body}\n`;
-      if (originName) markdown += `\n- Origin: [${originName}](../originals/${originName})\n`;
+      if (originName) markdown += `\n- Origin: [${originName}](../personal/originals/${originName})\n`;
       return markdown;
     }
 
@@ -198,12 +198,12 @@
       const id = `${stamp()}-${slug(title)}`;
       const noteName = `${id}.md`;
       await putFile(
-        `personal/inbox/${noteName}`,
+        `inbox/${noteName}`,
         textToBase64(inboxNote(title, body, originName)),
         `add inbox ${noteName}`,
       );
       await appendIndex(
-        "personal/inbox/INDEX.md",
+        "inbox/INDEX.md",
         `- [${title}](${noteName}) — ${description}`,
       );
     }
