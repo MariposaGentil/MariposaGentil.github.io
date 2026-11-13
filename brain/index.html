@@ -61,6 +61,7 @@
     <h1>Inbox</h1>
     <p>A photo, a note, or a voice message is filed on its own.</p>
     <button id="photo" type="button">Take a photo</button>
+    <button id="library" type="button">Choose a photo</button>
     <button id="note-open" type="button">Write a note</button>
     <button id="voice" type="button">Record voice</button>
     <div id="composer" class="hidden">
@@ -71,6 +72,7 @@
     <button id="forget" class="secondary" type="button">Forget token</button>
   </main>
   <input id="camera" type="file" accept="image/*" capture="environment" hidden>
+  <input id="files" type="file" accept="image/*" hidden>
 
   <script>
     const OWNER = "MariposaGentil";
@@ -82,6 +84,7 @@
     const app = document.querySelector("#app");
     const status = document.querySelector("#status");
     const camera = document.querySelector("#camera");
+    const files = document.querySelector("#files");
     const composer = document.querySelector("#composer");
     const noteBox = document.querySelector("#note");
     const voiceButton = document.querySelector("#voice");
@@ -216,8 +219,32 @@
       );
     }
 
+    function imageExt(file) {
+      const known = { jpg: "jpg", jpeg: "jpg", png: "png", gif: "gif", webp: "webp", heic: "heic", heif: "heic" };
+      const fromName = (file.name || "").toLowerCase().split(".").pop();
+      if (known[fromName]) return known[fromName];
+      const fromType = (file.type || "").toLowerCase().replace("image/", "");
+      return known[fromType] || "jpg";
+    }
+
+    async function sendPhoto(file) {
+      lock(true);
+      say("Sending the photo…");
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const name = `${stamp()}-photo.${imageExt(file)}`;
+        await fileOriginal(name, bytes);
+        await fileInbox("Photo", "", name, "Photo from the phone.");
+        say("In your inbox.");
+      } catch (error) {
+        say(error.message);
+      } finally {
+        lock(false);
+      }
+    }
+
     function lock(on) {
-      for (const id of ["photo", "note-open", "voice", "send-note", "forget"]) {
+      for (const id of ["photo", "library", "note-open", "voice", "send-note", "forget"]) {
         document.getElementById(id).disabled = on;
       }
     }
@@ -238,24 +265,18 @@
     };
 
     document.querySelector("#photo").onclick = () => camera.click();
+    document.querySelector("#library").onclick = () => files.click();
 
-    camera.onchange = async () => {
+    camera.onchange = () => {
       const file = camera.files && camera.files[0];
       camera.value = "";
-      if (!file) return;
-      lock(true);
-      say("Sending the photo…");
-      try {
-        const bytes = new Uint8Array(await file.arrayBuffer());
-        const name = `${stamp()}-photo.jpg`;
-        await fileOriginal(name, bytes);
-        await fileInbox("Photo", "", name, "Photo from the phone.");
-        say("In your inbox.");
-      } catch (error) {
-        say(error.message);
-      } finally {
-        lock(false);
-      }
+      if (file) sendPhoto(file);
+    };
+
+    files.onchange = () => {
+      const file = files.files && files.files[0];
+      files.value = "";
+      if (file) sendPhoto(file);
     };
 
     document.querySelector("#note-open").onclick = () => {
