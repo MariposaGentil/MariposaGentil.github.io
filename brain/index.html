@@ -73,15 +73,27 @@
       border: 0;
       font-family: "Libre Baskerville", Baskerville, Georgia, serif;
     }
-    button.upload.missed { background: #c44536; color: #fff; }
-    button.upload.sent { background: #2f7d4a; color: #fff; }
-    button.upload.missed:disabled {
+    button.upload { opacity: 1; }
+    button.upload.idle,
+    button.upload:disabled {
+      background: #9a9a9a;
+      color: #fff;
+      border: 0;
       opacity: 1;
-      background: transparent;
-      color: #c44536;
-      border: 1px solid #c44536;
     }
-    button.upload.sent:disabled { opacity: 1; }
+    button.upload.ready {
+      background: #fff;
+      color: #111;
+      border: 1px solid #111;
+    }
+    button.upload.failed { background: #c44536; color: #fff; border: 0; }
+    button.upload.sent { background: #2f7d4a; color: #fff; border: 0; }
+    #error {
+      margin: 12px 0 0;
+      text-align: center;
+      color: #c44536;
+      hyphens: none;
+    }
     button#save-token {
       border: 1px solid var(--theme-content-color-lighter);
       background: transparent;
@@ -135,7 +147,8 @@
     <div id="composer" class="hidden">
       <textarea id="note" placeholder="Write the note"></textarea>
     </div>
-    <button id="upload" class="wide upload missed" type="button" disabled>Upload</button>
+    <p id="error" class="hidden" role="alert"></p>
+    <button id="upload" class="wide upload idle" type="button" disabled>Upload</button>
     <p id="status" role="status"></p>
     <details class="danger">
       <summary class="material-symbols-outlined" aria-label="Danger zone">expand_more</summary>
@@ -163,6 +176,7 @@
   const noteBox = document.querySelector("#note");
   const voiceButton = document.querySelector("#voice");
   const uploadButton = document.querySelector("#upload");
+  const errorLine = document.querySelector("#error");
   const preview = document.querySelector("#preview");
 
   let token = localStorage.getItem(TOKEN_KEY) || "";
@@ -175,7 +189,7 @@
   let voiceTake = null;
   let recording = false;
   let busy = false;
-  let uploaded = false;
+  let outcome = "";
 
   function show(which) {
     setup.classList.toggle("hidden", which !== "setup");
@@ -187,15 +201,49 @@
 
   function say(text) { status.textContent = text; }
 
+  function showError(text) {
+    errorLine.textContent = text || "";
+    errorLine.classList.toggle("hidden", !text);
+  }
+
+  function shortError(error) {
+    const text = String(error && error.message || "");
+    if (text.includes("token was rejected")) return "The token was rejected.";
+    if (/Failed to fetch|NetworkError|network/i.test(text)) return "Could not reach GitHub.";
+    if (/413|too large/i.test(text)) return "The file is too large.";
+    if (/"status":\s*"403"|\b403\b/.test(text)) return "The token cannot write.";
+    return "Upload failed.";
+  }
+
   function ready() {
     return !!(photoFile || noteBox.value.trim() || voiceTake);
   }
 
+  function clearSelection() {
+    clearPhoto();
+    noteBox.value = "";
+    composer.classList.add("hidden");
+    voiceTake = null;
+    outcome = "";
+    showError("");
+    say("");
+  }
+
   function paint() {
-    const sent = uploaded && !ready();
-    uploadButton.disabled = busy || recording || !ready();
-    uploadButton.classList.toggle("sent", sent);
-    uploadButton.classList.toggle("missed", !sent);
+    uploadButton.classList.remove("idle", "ready", "failed", "sent");
+    if (busy || recording || (outcome !== "success" && outcome !== "error" && !ready())) {
+      uploadButton.disabled = true;
+      uploadButton.classList.add("idle");
+    } else if (outcome === "success") {
+      uploadButton.disabled = false;
+      uploadButton.classList.add("sent");
+    } else if (outcome === "error") {
+      uploadButton.disabled = false;
+      uploadButton.classList.add("failed");
+    } else {
+      uploadButton.disabled = false;
+      uploadButton.classList.add("ready");
+    }
     document.querySelector("#photo").setAttribute("aria-pressed", photoFrom === "camera" ? "true" : "false");
     document.querySelector("#library").setAttribute("aria-pressed", photoFrom === "files" ? "true" : "false");
     document.querySelector("#note-open").setAttribute("aria-pressed", noteBox.value.trim() ? "true" : "false");
@@ -338,13 +386,15 @@
   }
 
   function holdPhoto(file, from) {
-    clearPhoto();
+    if (outcome) clearSelection();
+    else clearPhoto();
     photoFile = file;
     photoFrom = from;
     previewUrl = URL.createObjectURL(file);
     preview.src = previewUrl;
     preview.classList.remove("hidden");
-    uploaded = false;
+    outcome = "";
+    showError("");
     say("Photo ready.");
     paint();
   }
@@ -382,6 +432,8 @@
     localStorage.setItem(TOKEN_KEY, token);
     document.querySelector("#token").value = "";
     show("app");
+    outcome = "";
+    showError("");
     say("");
     paint();
   };
@@ -389,12 +441,8 @@
   document.querySelector("#forget").onclick = () => {
     localStorage.removeItem(TOKEN_KEY);
     token = "";
-    clearPhoto();
-    noteBox.value = "";
-    voiceTake = null;
-    uploaded = false;
+    clearSelection();
     show("setup");
-    say("");
   };
 
   document.querySelector("#photo").onclick = () => camera.click();
@@ -418,36 +466,34 @@
   };
 
   noteBox.addEventListener("input", () => {
-    uploaded = false;
+    if (outcome) return;
+    showError("");
     paint();
   });
 
   uploadButton.onclick = async () => {
+    if (outcome === "success" || outcome === "error") {
+      clearSelection();
+      paint();
+      return;
+    }
     if (!ready() || recording || busy) return;
     busy = true;
     lock(true);
+    showError("");
     paint();
     say("Sending…");
     try {
-      if (photoFile) {
-        await sendPhoto(photoFile);
-        clearPhoto();
-      }
+      if (photoFile) await sendPhoto(photoFile);
       const text = noteBox.value.trim();
-      if (text) {
-        await sendNote(text);
-        noteBox.value = "";
-        composer.classList.add("hidden");
-      }
-      if (voiceTake) {
-        await sendVoice(voiceTake);
-        voiceTake = null;
-      }
-      uploaded = true;
-      say("In your inbox.");
+      if (text) await sendNote(text);
+      if (voiceTake) await sendVoice(voiceTake);
+      outcome = "success";
+      say("");
     } catch (error) {
-      uploaded = false;
-      say(error.message);
+      outcome = "error";
+      say("");
+      showError(shortError(error));
     } finally {
       busy = false;
       lock(false);
@@ -473,12 +519,14 @@
     recorder.onstop = () => {
       stream.getTracks().forEach((track) => track.stop());
       recording = false;
+      if (outcome) clearSelection();
       voiceButton.classList.remove("recording");
       voiceButton.setAttribute("aria-label", "Record voice");
       voiceButton.querySelector(".material-symbols-outlined").textContent = "mic";
       const blob = new Blob(chunks, { type: mime });
       voiceTake = { blob, ext: mime === "audio/mp4" ? "m4a" : "webm" };
-      uploaded = false;
+      outcome = "";
+      showError("");
       recorder = null;
       say("Voice ready.");
       paint();
