@@ -152,7 +152,7 @@
 <body>
 <div class="body-index">
   <div class="page-title"><h1>Brain</h1></div>
-  <div class="page-description" id="lede">A photo, a note, or a voice message.</div>
+  <div class="page-description" id="lede">Upload a file to your second brain</div>
   <hr>
 
   <main id="setup" class="hidden">
@@ -224,7 +224,7 @@
     app.classList.toggle("hidden", which !== "app");
     lede.textContent = which === "setup"
       ? "Paste a token that can write to MariposaGentil/Brain. It stays on this phone."
-      : "A photo, a note, or a voice message.";
+      : "Upload a file to your second brain";
   }
 
   function say(text) { status.textContent = text; }
