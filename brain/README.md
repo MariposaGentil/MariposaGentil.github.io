@@ -11,7 +11,7 @@ The screen matches the Cocoon home page. Four icons sit in a row:
 - Note: type a note.
 - Microphone: record a voice message.
 
-Those icons only prepare a capture. **Upload** underneath sends it. The button is grey until there is something to send, then white. A failed send turns it red and shows a short message above it. A successful send turns it green. Tap the red or green button to clear the selection. A photo, a note, and a voice message can wait at the same time. One tap sends each of them.
+Those icons only prepare a capture. **Upload** underneath sends it. The button is grey until there is something to send, then white. A square beside it drops that selection without sending. A failed send turns it red and shows a short message above it. A successful send turns it green. Tap the red or green button to clear the selection. A photo, a note, and a voice message can wait at the same time. One tap sends each of them.
 
 A photo or a voice file is stored with the note. A typed note is the text alone. Each capture is filed on its own. The page accepts a file under 100MB.
 

@@ -55,9 +55,13 @@
       object-fit: contain;
       margin-top: 12px;
     }
+    #composer { width: 100%; margin: 0; padding: 0; }
     textarea, input[type="password"] {
+      display: block;
+      box-sizing: border-box;
       width: 100%;
-      margin-top: 12px;
+      max-width: 100%;
+      margin: 12px 0 0;
       background: transparent;
       color: var(--theme-content-color);
       border: 1px solid var(--theme-content-color-lighter);
@@ -65,6 +69,13 @@
       padding: 12px;
     }
     textarea { min-height: 140px; resize: vertical; }
+    .send-row {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 12px;
+    }
     button.wide {
       width: 100%;
       margin-top: 12px;
@@ -73,6 +84,19 @@
       border: 0;
       font-family: "Libre Baskerville", Baskerville, Georgia, serif;
     }
+    .send-row button.upload { width: auto; flex: 1; margin-top: 0; }
+    #clear {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--theme-content-color-lighter);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--theme-content-color);
+    }
+    #clear.hidden { display: none; }
     button.upload { opacity: 1; }
     button.upload.idle,
     button.upload:disabled {
@@ -148,7 +172,10 @@
       <textarea id="note" placeholder="Write the note"></textarea>
     </div>
     <p id="error" class="hidden" role="alert"></p>
-    <button id="upload" class="wide upload idle" type="button" disabled>Upload</button>
+    <div class="send-row">
+      <button id="upload" class="wide upload idle" type="button" disabled>Upload</button>
+      <button id="clear" class="hidden" type="button" aria-label="Remove"><span class="material-symbols-outlined">close</span></button>
+    </div>
     <p id="status" role="status"></p>
     <details class="danger">
       <summary class="material-symbols-outlined" aria-label="Danger zone">expand_more</summary>
@@ -176,6 +203,7 @@
   const noteBox = document.querySelector("#note");
   const voiceButton = document.querySelector("#voice");
   const uploadButton = document.querySelector("#upload");
+  const clearButton = document.querySelector("#clear");
   const errorLine = document.querySelector("#error");
   const preview = document.querySelector("#preview");
 
@@ -243,6 +271,14 @@
     } else {
       uploadButton.disabled = false;
       uploadButton.classList.add("ready");
+    }
+    const canRemove = !busy && !recording && !outcome && ready();
+    clearButton.classList.toggle("hidden", !canRemove);
+    clearButton.disabled = !canRemove;
+    if (canRemove) {
+      const side = uploadButton.getBoundingClientRect().height;
+      clearButton.style.width = `${side}px`;
+      clearButton.style.height = `${side}px`;
     }
     document.querySelector("#photo").setAttribute("aria-pressed", photoFrom === "camera" ? "true" : "false");
     document.querySelector("#library").setAttribute("aria-pressed", photoFrom === "files" ? "true" : "false");
@@ -443,6 +479,12 @@
     token = "";
     clearSelection();
     show("setup");
+  };
+
+  clearButton.onclick = () => {
+    if (busy || recording) return;
+    clearSelection();
+    paint();
   };
 
   document.querySelector("#photo").onclick = () => camera.click();
