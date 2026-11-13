@@ -4,12 +4,13 @@ Phone page for sending a capture into the private notes repository [MariposaGent
 
 On the first visit the page asks for a GitHub token that can write to that repository. The token stays in the phone. It is not stored in this site.
 
-The screen matches the Cocoon home page. Four icons sit in a row:
+The screen matches the Cocoon home page. Five icons sit in a row:
 
 - Camera: take a photo.
 - Photo library: choose a photo from files.
 - Note: type a note.
 - Microphone: record a voice message.
+- Link: clip a web page. Paste its address. A typed note on the same send is kept with that clip.
 
 Those icons only prepare a capture. **Upload** underneath sends it. The button is grey until there is something to send, then white. A square beside it drops that selection without sending. A failed send turns it red and shows a short message above it. A successful send turns it green. Tap the red or green button to clear the selection. A photo, a note, and a voice message can wait at the same time. One tap sends each of them.
 

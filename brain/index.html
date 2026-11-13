@@ -56,7 +56,7 @@
       margin-top: 12px;
     }
     #composer { width: 100%; margin: 0; padding: 0; }
-    textarea, input[type="password"] {
+    textarea, input[type="password"], input[type="url"] {
       display: block;
       box-sizing: border-box;
       width: 100%;
@@ -166,8 +166,12 @@
       <button id="library" type="button" aria-label="Choose a photo" aria-pressed="false"><span class="material-symbols-outlined">photo_library</span></button>
       <button id="note-open" type="button" aria-label="Write a note" aria-pressed="false"><span class="material-symbols-outlined">edit_note</span></button>
       <button id="voice" type="button" aria-label="Record voice" aria-pressed="false"><span class="material-symbols-outlined">mic</span></button>
+      <button id="clip-open" type="button" aria-label="Clip a link" aria-pressed="false"><span class="material-symbols-outlined">link</span></button>
     </div>
     <img id="preview" class="hidden" alt="">
+    <div id="clipper" class="hidden">
+      <input id="clip-url" type="url" inputmode="url" autocomplete="off" placeholder="https://…">
+    </div>
     <div id="composer" class="hidden">
       <textarea id="note" placeholder="Write the note"></textarea>
     </div>
@@ -200,6 +204,8 @@
   const camera = document.querySelector("#camera");
   const files = document.querySelector("#files");
   const composer = document.querySelector("#composer");
+  const clipper = document.querySelector("#clipper");
+  const clipBox = document.querySelector("#clip-url");
   const noteBox = document.querySelector("#note");
   const voiceButton = document.querySelector("#voice");
   const uploadButton = document.querySelector("#upload");
@@ -243,14 +249,20 @@
     return "Upload failed.";
   }
 
+  function clipValue() {
+    return clipBox.value.trim();
+  }
+
   function ready() {
-    return !!(photoFile || noteBox.value.trim() || voiceTake);
+    return !!(photoFile || noteBox.value.trim() || voiceTake || clipValue());
   }
 
   function clearSelection() {
     clearPhoto();
     noteBox.value = "";
     composer.classList.add("hidden");
+    clipBox.value = "";
+    clipper.classList.add("hidden");
     voiceTake = null;
     outcome = "";
     showError("");
@@ -284,6 +296,7 @@
     document.querySelector("#library").setAttribute("aria-pressed", photoFrom === "files" ? "true" : "false");
     document.querySelector("#note-open").setAttribute("aria-pressed", noteBox.value.trim() ? "true" : "false");
     voiceButton.setAttribute("aria-pressed", voiceTake ? "true" : "false");
+    document.querySelector("#clip-open").setAttribute("aria-pressed", clipValue() ? "true" : "false");
   }
 
   function stamp() {
@@ -375,19 +388,20 @@
     }
   }
 
-  function inboxNote(title, body, originName) {
+  function inboxNote(title, body, originName, sourceUrl) {
     let markdown = `---\ntags:\n  - capture\n---\n\n# ${title}\n`;
+    if (sourceUrl) markdown += `\n- Source: ${sourceUrl}\n`;
     if (body) markdown += `\n${body}\n`;
     if (originName) markdown += `\n- Origin: [${originName}](../personal/originals/${originName})\n`;
     return markdown;
   }
 
-  async function fileInbox(title, body, originName, description) {
+  async function fileInbox(title, body, originName, description, sourceUrl) {
     const id = `${stamp()}-${slug(title)}`;
     const noteName = `${id}.md`;
     await putFile(
       `inbox/${noteName}`,
-      textToBase64(inboxNote(title, body, originName)),
+      textToBase64(inboxNote(title, body, originName, sourceUrl)),
       `add inbox ${noteName}`,
     );
     await appendIndex(
@@ -442,6 +456,17 @@
     await fileInbox("Photo", "", name, "Photo from the phone.");
   }
 
+  async function sendClip(url, text) {
+    let title = url;
+    let body = "";
+    if (text) {
+      const lines = text.split("\n");
+      title = lines[0].slice(0, 80);
+      body = lines.slice(1).join("\n").trim();
+    }
+    await fileInbox(title, body, "", url, url);
+  }
+
   async function sendNote(text) {
     const lines = text.split("\n");
     const title = lines[0].slice(0, 80);
@@ -457,7 +482,7 @@
   }
 
   function lock(on) {
-    for (const id of ["photo", "library", "note-open", "voice"]) {
+    for (const id of ["photo", "library", "note-open", "voice", "clip-open"]) {
       document.getElementById(id).disabled = on;
     }
   }
@@ -507,6 +532,22 @@
     if (!composer.classList.contains("hidden")) noteBox.focus();
   };
 
+  document.querySelector("#clip-open").onclick = () => {
+    clipper.classList.toggle("hidden");
+    if (!clipper.classList.contains("hidden")) clipBox.focus();
+  };
+
+  clipBox.addEventListener("input", () => {
+    if (outcome) {
+      const url = clipBox.value;
+      clearSelection();
+      clipBox.value = url;
+      clipper.classList.remove("hidden");
+    }
+    showError("");
+    paint();
+  });
+
   noteBox.addEventListener("input", () => {
     if (outcome) return;
     showError("");
@@ -528,7 +569,9 @@
     try {
       if (photoFile) await sendPhoto(photoFile);
       const text = noteBox.value.trim();
-      if (text) await sendNote(text);
+      const url = clipValue();
+      if (url) await sendClip(url, text);
+      else if (text) await sendNote(text);
       if (voiceTake) await sendVoice(voiceTake);
       outcome = "success";
       say("");
