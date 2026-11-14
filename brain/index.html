@@ -30,7 +30,14 @@
     })();
   </script>
   <style>
-    .body-index { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+    .body-index {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      container-type: inline-size;
+    }
+    .page-title h1 {
+      font-size: min(150%, 17cqi);
+      white-space: nowrap;
+    }
     .page-description { margin-bottom: 0; }
     .body-index hr {
       height: 0;
