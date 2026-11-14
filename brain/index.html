@@ -714,6 +714,11 @@
     if (!typing() && window.scrollY !== 0) window.scrollTo(0, 0);
   }
 
+  const paper = getComputedStyle(document.body).backgroundImage;
+  document.documentElement.style.backgroundImage = paper;
+  document.querySelector(".status-shield").style.backgroundImage = paper;
+  document.body.style.background = "transparent";
+
   window.addEventListener("scroll", pinTop, { passive: true });
   document.addEventListener("focusout", () => setTimeout(pinTop, 300));
 
