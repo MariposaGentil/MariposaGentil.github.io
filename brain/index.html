@@ -30,8 +30,31 @@
     })();
   </script>
   <style>
-    .body-index {
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+    html { background-color: var(--theme-bg-color); }
+    .scroller {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
       padding-top: env(safe-area-inset-top);
+    }
+    .status-shield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top);
+      z-index: 1;
+      background-color: var(--theme-bg-color);
+      background-image: inherit;
+    }
+    .body-index {
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
       container-type: inline-size;
     }
@@ -167,6 +190,8 @@
   </style>
 </head>
 <body>
+<div class="status-shield" aria-hidden="true"></div>
+<div class="scroller">
 <div class="body-index">
   <div class="page-title"><h1>Brain Inbox</h1></div>
   <div class="page-description" id="lede">Upload a file to your second brain</div>
@@ -204,6 +229,7 @@
       <button id="forget" class="wide" type="button">Forget token</button>
     </details>
   </main>
+</div>
 </div>
 <input id="camera" type="file" accept="image/*" capture="environment" hidden>
 <input id="files" type="file" accept="image/*" hidden>
