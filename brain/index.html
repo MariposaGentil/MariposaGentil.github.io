@@ -705,9 +705,17 @@
     paint();
   };
 
-  window.addEventListener("scroll", () => {
-    if (window.scrollY !== 0) window.scrollTo(0, 0);
-  }, { passive: true });
+  function typing() {
+    const el = document.activeElement;
+    return !!el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT");
+  }
+
+  function pinTop() {
+    if (!typing() && window.scrollY !== 0) window.scrollTo(0, 0);
+  }
+
+  window.addEventListener("scroll", pinTop, { passive: true });
+  document.addEventListener("focusout", () => setTimeout(pinTop, 300));
 
   show(token ? "app" : "setup");
   paint();
