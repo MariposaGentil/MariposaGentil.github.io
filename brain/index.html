@@ -259,12 +259,12 @@
 
   let token = localStorage.getItem(TOKEN_KEY) || "";
   let recorder = null;
-  let chunks = [];
   let stream = null;
   let photoFile = null;
   let photoFrom = "";
   let previewUrl = "";
   let voiceTake = null;
+  let active = "";
   let recording = false;
   let busy = false;
   let outcome = "";
@@ -308,9 +308,21 @@
     clipBox.value = "";
     clipper.classList.add("hidden");
     voiceTake = null;
+    active = "";
     outcome = "";
     showError("");
     say("");
+  }
+
+  function switchTo(kind) {
+    if (kind === active) return;
+    if (recorder && recorder.state === "recording") {
+      recorder.discard = true;
+      recorder.stop();
+    }
+    clearSelection();
+    active = kind;
+    paint();
   }
 
   function paint() {
@@ -479,6 +491,7 @@
   function holdPhoto(file, from) {
     if (outcome) clearSelection();
     else clearPhoto();
+    active = from;
     photoFile = file;
     photoFrom = from;
     previewUrl = URL.createObjectURL(file);
@@ -553,8 +566,14 @@
     paint();
   };
 
-  document.querySelector("#photo").onclick = () => camera.click();
-  document.querySelector("#library").onclick = () => files.click();
+  document.querySelector("#photo").onclick = () => {
+    switchTo("camera");
+    camera.click();
+  };
+  document.querySelector("#library").onclick = () => {
+    switchTo("files");
+    files.click();
+  };
 
   camera.onchange = () => {
     const file = camera.files && camera.files[0];
@@ -569,12 +588,22 @@
   };
 
   document.querySelector("#note-open").onclick = () => {
-    composer.classList.toggle("hidden");
+    if (active !== "note") {
+      switchTo("note");
+      composer.classList.remove("hidden");
+    } else {
+      composer.classList.toggle("hidden");
+    }
     if (!composer.classList.contains("hidden")) noteBox.focus();
   };
 
   document.querySelector("#clip-open").onclick = () => {
-    clipper.classList.toggle("hidden");
+    if (active !== "clip") {
+      switchTo("clip");
+      clipper.classList.remove("hidden");
+    } else {
+      clipper.classList.toggle("hidden");
+    }
     if (!clipper.classList.contains("hidden")) clipBox.focus();
   };
 
@@ -582,6 +611,7 @@
     if (outcome) {
       const url = clipBox.value;
       clearSelection();
+      active = "clip";
       clipBox.value = url;
       clipper.classList.remove("hidden");
     }
@@ -632,28 +662,37 @@
       recorder.stop();
       return;
     }
+    switchTo("voice");
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (error) {
       say("The microphone is blocked.");
       return;
     }
+    const mic = stream;
     const mime = MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4" : "audio/webm";
-    chunks = [];
-    recorder = new MediaRecorder(stream, { mimeType: mime });
-    recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
-    recorder.onstop = () => {
-      stream.getTracks().forEach((track) => track.stop());
+    const takeChunks = [];
+    const rec = new MediaRecorder(mic, { mimeType: mime });
+    recorder = rec;
+    rec.ondataavailable = (event) => { if (event.data.size) takeChunks.push(event.data); };
+    rec.onstop = () => {
+      mic.getTracks().forEach((track) => track.stop());
+      if (recorder !== rec) return;
       recording = false;
-      if (outcome) clearSelection();
+      recorder = null;
       voiceButton.classList.remove("recording");
       voiceButton.setAttribute("aria-label", "Record voice");
       voiceButton.querySelector(".material-symbols-outlined").textContent = "mic";
-      const blob = new Blob(chunks, { type: mime });
+      if (rec.discard) {
+        paint();
+        return;
+      }
+      if (outcome) clearSelection();
+      active = "voice";
+      const blob = new Blob(takeChunks, { type: mime });
       voiceTake = { blob, ext: mime === "audio/mp4" ? "m4a" : "webm" };
       outcome = "";
       showError("");
-      recorder = null;
       say("Voice ready.");
       paint();
     };
