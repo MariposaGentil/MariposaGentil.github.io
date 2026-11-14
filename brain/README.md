@@ -12,10 +12,10 @@ The screen matches the Cocoon home page. Five icons sit in a row:
 - Microphone: record a voice message.
 - Link: clip a web page. Paste its address. A typed note on the same send is kept with that clip.
 
-Those icons only prepare a capture. **Upload** underneath sends it. The button is grey until there is something to send, then white. A square beside it drops that selection without sending. A failed send turns it red and shows a short message above it. A successful send turns it green. Tap the red or green button to clear the selection. A photo, a note, and a voice message can wait at the same time. One tap sends each of them.
+Those icons only prepare a capture. **Upload** underneath sends it. The button is grey until there is something to send, then white. A square beside it drops that selection without sending. A failed send turns it red and shows a short message above it. A successful send clears the selection and says Sent. Tap the red button to clear a failed selection. A photo, a note, and a voice message can wait at the same time. One tap sends each of them.
 
 A photo or a voice file is stored with the note. A typed note is the text alone. Each capture is filed on its own. The page accepts a file under 100MB.
 
-On an iPhone, use Share → Add to Home Screen. The camera and the microphone need that home-screen icon.
+The page has a web app manifest, so it installs as Brain Inbox with the Cocoon icon. On an iPhone, use Share → Add to Home Screen. On Android, use Install app in the browser menu. The camera and the microphone need that home-screen icon.
 
 The chevron at the bottom opens **Danger zone**. **Forget token** there removes the token from the phone.

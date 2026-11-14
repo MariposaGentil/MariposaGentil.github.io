@@ -7,7 +7,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#111111">
-  <title>Brain</title>
+  <meta name="apple-mobile-web-app-title" content="Brain Inbox">
+  <title>Brain Inbox</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
   <link rel="stylesheet" href="/assets/css/styling.max.css">
   <script>
@@ -28,11 +32,17 @@
   <style>
     .body-index { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
     .page-description { margin-bottom: 0; }
+    .body-index hr {
+      height: 0;
+      border: 0;
+      border-top: 1px solid var(--theme-content-color-lighter);
+      margin: 5.5px 0;
+    }
     .actions {
       display: flex;
       flex-direction: row;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 5.5px;
     }
     .actions button {
       flex: 1;
@@ -111,7 +121,6 @@
       border: 1px solid #111;
     }
     button.upload.failed { background: #c44536; color: #fff; border: 0; }
-    button.upload.sent { background: #2f7d4a; color: #fff; border: 0; }
     #error {
       margin: 12px 0 0;
       text-align: center;
@@ -151,7 +160,7 @@
 </head>
 <body>
 <div class="body-index">
-  <div class="page-title"><h1>Brain</h1></div>
+  <div class="page-title"><h1>Brain Inbox</h1></div>
   <div class="page-description" id="lede">Upload a file to your second brain</div>
   <hr>
 
@@ -270,13 +279,10 @@
   }
 
   function paint() {
-    uploadButton.classList.remove("idle", "ready", "failed", "sent");
-    if (busy || recording || (outcome !== "success" && outcome !== "error" && !ready())) {
+    uploadButton.classList.remove("idle", "ready", "failed");
+    if (busy || recording || (outcome !== "error" && !ready())) {
       uploadButton.disabled = true;
       uploadButton.classList.add("idle");
-    } else if (outcome === "success") {
-      uploadButton.disabled = false;
-      uploadButton.classList.add("sent");
     } else if (outcome === "error") {
       uploadButton.disabled = false;
       uploadButton.classList.add("failed");
@@ -555,7 +561,7 @@
   });
 
   uploadButton.onclick = async () => {
-    if (outcome === "success" || outcome === "error") {
+    if (outcome === "error") {
       clearSelection();
       paint();
       return;
@@ -573,8 +579,8 @@
       if (url) await sendClip(url, text);
       else if (text) await sendNote(text);
       if (voiceTake) await sendVoice(voiceTake);
-      outcome = "success";
-      say("");
+      clearSelection();
+      say("Sent.");
     } catch (error) {
       outcome = "error";
       say("");
