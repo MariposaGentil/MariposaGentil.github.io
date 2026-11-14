@@ -38,7 +38,11 @@
     html { background-color: var(--theme-bg-color); }
     .scroller {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(100% + env(safe-area-inset-top));
+      background-color: var(--theme-bg-color);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-y: contain;
@@ -717,6 +721,7 @@
   const paper = getComputedStyle(document.body).backgroundImage;
   document.documentElement.style.backgroundImage = paper;
   document.querySelector(".status-shield").style.backgroundImage = paper;
+  document.querySelector(".scroller").style.backgroundImage = paper;
   document.body.style.background = "transparent";
 
   window.addEventListener("scroll", pinTop, { passive: true });
